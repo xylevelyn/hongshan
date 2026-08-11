@@ -1,0 +1,12 @@
+{
+  "name": "hongshan-zoo-demo",
+  "version": "1.0.0",
+  "description": "红山动物星球 - AI引导下的动物园沉浸式游览Demo",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve . -l 8080"
+  },
+  "keywords": ["zoo", "ai", "h5", "demo", "meerkat"],
+  "license": "MIT"
+}

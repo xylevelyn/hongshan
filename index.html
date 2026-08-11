@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>红山动物星球 - Demo</title>
+  <link rel="stylesheet" href="css/base.css?v=12">
+</head>
+<body>
+
+<div class="app-container">
+
+  <!-- ==================== Status Bar ==================== -->
+  <div class="status-bar">
+    <span id="status-time">9:00</span>
+    <span>📶 🔋</span>
+  </div>
+
+  <!-- ==================== View Container ==================== -->
+  <div class="view-container">
+
+    <!-- ==================== Stage 1, Step 0: Welcome ==================== -->
+    <div class="view active" id="stage0-step0">
+      <div class="center-col" style="justify-content:flex-start;padding-top:60px;padding-bottom:0">
+        <div class="emoji-big">🌿🦊🌿</div>
+        <h3 class="title-md">欢迎来到红山动物星球</h3>
+        <p class="text-muted">在这里，你可以选择幻化成一种动物，尽情探索</p>
+        <!-- 地图局部背景层 -->
+        <div style="width:100%;flex:1;min-height:180px;background-image:url('assets/zoo_map.png');background-size:cover;background-position:center bottom;position:relative;overflow:hidden">
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(250,246,240,.5) 0%,transparent 25%,transparent 60%,rgba(250,246,240,.85) 100%)"></div>
+        </div>
+        <!-- 悬浮按钮 -->
+        <div style="position:absolute;bottom:72px;left:16px;right:16px;z-index:10">
+          <button class="btn-primary" style="border-radius:var(--radius);margin-bottom:0;padding:14px;font-size:1.05rem;box-shadow:0 4px 16px rgba(0,0,0,.15)" onclick="App.next()">开始探索</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== Stage 1, Step 1: Privacy + Info ==================== -->
+    <div class="view" id="stage0-step1">
+      <div style="padding:16px;flex:1;display:flex;flex-direction:column">
+        <h3 class="title-md" style="text-align:center;margin-bottom:1rem">基本信息</h3>
+        <div style="background:var(--bg2);border-radius:var(--radius);padding:12px;margin-bottom:1rem;font-size:.78rem;color:var(--ink)">
+          <p style="font-weight:700;margin-bottom:.3rem">《AI 游览数据处理说明》</p>
+          <p style="color:var(--muted)">本应用将收集您的位置信息用于园区内导航，收集语音输入用于角色识别与对话交互，收集游览人数与年龄信息用于匹配适合的讲解风格，收集游览路径用于路线规划与故事生成。所有数据仅在本次游览期间使用，离园后30天自动清除...</p>
+        </div>
+        <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;margin-bottom:1rem">
+          <input type="checkbox" id="privacy-check">
+          我已阅读并同意《AI 游览数据处理说明》
+        </label>
+        <p style="font-size:.78rem;color:var(--muted);margin-bottom:.4rem">共同游玩人数</p>
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:1rem">
+          <button onclick="Stage1.adjustPeople(-1)" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--rule);background:var(--white);font-size:1.2rem;cursor:pointer">−</button>
+          <input type="number" id="people-count" value="1" min="1" max="5" readonly style="width:50px;text-align:center;border:1px solid var(--rule);border-radius:8px;padding:8px;font-size:.85rem">
+          <button onclick="Stage1.adjustPeople(1)" style="width:36px;height:36px;border-radius:50%;border:1px solid var(--rule);background:var(--white);font-size:1.2rem;cursor:pointer">+</button>
+          <span style="font-size:.78rem;color:var(--muted)">人</span>
+        </div>
+        <p style="font-size:.78rem;color:var(--muted);margin-bottom:.4rem">各自年龄</p>
+        <div id="age-list" style="margin-bottom:1rem"></div>
+        <button class="btn-primary" onclick="Stage1.step1_submit()">下一步</button>
+        <button class="btn-secondary" style="margin-top:.4rem" onclick="App.prev()">取消</button>
+      </div>
+    </div>
+
+    <!-- ==================== Stage 1, Step 2: Animal Identity Selection (Horizontal Cards) ==================== -->
+    <div class="view" id="stage0-step2">
+      <div style="padding:16px;flex:1;display:flex;flex-direction:column;align-items:center">
+        <h3 class="title-md" style="text-align:center;margin-bottom:.5rem">本次冒险你将变身成小动物，请选择你的身份</h3>
+        <!-- 横拉卡片容器 -->
+        <div id="animal-cards-scroll" style="width:100%;flex:1;display:flex;align-items:center;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;padding:20px 0;gap:12px">
+          <!-- 卡片由 JS 动态生成 -->
+        </div>
+        <!-- 随机选择按钮 -->
+        <button class="btn-secondary" style="margin-bottom:.5rem" onclick="Stage1.step2_randomSelect()">🎲 随机选择</button>
+        <!-- 确定按钮 -->
+        <button class="btn-primary" id="step2-confirm-btn" disabled style="opacity:.5;cursor:not-allowed" onclick="Stage1.step2_confirm()">确定</button>
+      </div>
+    </div>
+
+    <!-- ==================== Stage 2, Step 0: Venue Selection ==================== -->
+    <div class="view" id="stage1-step0">
+      <div style="padding:16px;flex:1;display:flex;flex-direction:column">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:.5rem">
+          <span style="font-size:.85rem;color:var(--accent);font-weight:600">📍 路线规划</span>
+        </div>
+        <p id="venue-select-intro" style="font-size:.85rem;color:var(--ink);margin-bottom:1rem"></p>
+        <!-- 地图缩略图 -->
+        <div style="width:100%;height:120px;background-image:url('assets/zoo_map.png');background-size:cover;background-position:center;border-radius:var(--radius);margin-bottom:1rem;position:relative;overflow:hidden">
+          <div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 0%,rgba(250,246,240,.3) 100%)"></div>
+        </div>
+        <p style="font-size:.78rem;color:var(--muted);margin-bottom:.4rem">选择想去的场馆（可多选）</p>
+        <!-- 场馆多选列表 -->
+        <div id="venue-checkbox-list" style="flex:1;overflow-y:auto;margin-bottom:1rem;-webkit-overflow-scrolling:touch">
+          <!-- 由 JS 动态生成 -->
+        </div>
+        <div style="display:flex;gap:8px">
+          <button class="btn-secondary" style="flex:1" onclick="App.prev()">上一步</button>
+          <button class="btn-primary" id="venue-confirm-btn" disabled style="flex:1;opacity:.5;cursor:not-allowed" onclick="Stage2.confirmVenues()">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== Stage 2, Step 1: Recommended Route ==================== -->
+    <div class="view" id="stage1-step1">
+      <div style="padding:12px;flex:1;display:flex;flex-direction:column">
+        <h3 class="title-md" style="text-align:center;margin-bottom:.5rem">推荐路线</h3>
+        <p style="font-size:.75rem;color:var(--muted);text-align:center;margin-bottom:.8rem">基于最短路径算法优化</p>
+        <!-- 地图 -->
+        <div class="map-view" id="stage2-route-map" style="flex:0 0 140px;background-image:url('assets/zoo_map.png')">
+          <svg id="route-svg" style="position:absolute;top:0;left:0;width:100%;height:100%;z-index:1;pointer-events:none">
+            <!-- 路线由 JS 动态绘制 -->
+          </svg>
+          <div id="route-map-pins"></div>
+        </div>
+        <!-- 路线列表 -->
+        <div id="route-list" style="padding:8px 12px;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch">
+          <!-- 由 JS 动态生成 -->
+        </div>
+        <div style="display:flex;gap:8px;padding-top:8px">
+          <button class="btn-secondary" style="flex:1" onclick="App.prev()">返回选择</button>
+          <button class="btn-primary" style="flex:1" onclick="App.next()">开始导航</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== Stage 2, Step 2: Start Navigation ==================== -->
+    <div class="view" id="stage1-step2">
+      <div class="center-col">
+        <div class="emoji-big">🧭</div>
+        <h3 class="title-md">路线已确定！</h3>
+        <p class="text-muted">探险正式开始，跟随脚印前进吧</p>
+        <div id="next-stop-info" style="background:var(--bg2);border-radius:var(--radius);padding:12px;width:100%;margin-bottom:1rem">
+          <p style="font-size:.75rem;color:var(--accent);font-weight:600;margin-bottom:.3rem">下一站</p>
+          <p id="next-stop-name" style="font-size:1rem;font-weight:700"></p>
+          <p id="next-stop-eta" style="font-size:.75rem;color:var(--muted)"></p>
+        </div>
+        <button class="btn-primary" onclick="App.next()">🧭 开始导航</button>
+        <button class="btn-secondary" style="margin-top:.4rem" onclick="App.prev()">返回路线</button>
+      </div>
+    </div>
+
+    <!-- ==================== Stage 3, Step 0: Navigate to Venue (Dynamic) ==================== -->
+    <div class="view" id="stage2-step0">
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px">
+        <div style="font-size:3rem;margin-bottom:1rem" id="venue-nav-icon">🧭</div>
+        <h3 class="title-md" id="venue-nav-title">前往场馆</h3>
+        <p class="text-muted" id="venue-nav-desc">跟随脚印前进</p>
+        <div style="width:100%;background:var(--bg2);border-radius:var(--radius);padding:16px;margin-bottom:1rem;text-align:center">
+          <p style="font-size:.75rem;color:var(--muted);margin-bottom:.3rem">ETA</p>
+          <p style="font-size:1.4rem;font-weight:700;color:var(--accent)" id="venue-nav-eta">2 分钟</p>
+          <p style="font-size:.75rem;color:var(--muted)" id="venue-nav-relation">关系：探索</p>
+        </div>
+        <button class="btn-primary" onclick="App.next()" id="venue-nav-btn">到达场馆</button>
+      </div>
+    </div>
+
+    <!-- ==================== Stage 3, Step 1: Venue Science Chat (Dynamic) ==================== -->
+    <div class="view" id="stage2-step1">
+      <!-- 地图底图层 -->
+      <div style="position:absolute;inset:0;background-image:url('assets/zoo_map.png');background-size:cover;background-position:center;z-index:0"></div>
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(250,246,240,.3) 0%,rgba(250,246,240,.6) 100%);z-index:0"></div>
+      <!-- 内容层 -->
+      <div style="position:relative;z-index:1;display:flex;flex-direction:column;height:100%">
+        <div style="padding:12px 0 0;text-align:center">
+          <span style="font-size:.78rem;color:var(--accent);font-weight:600;background:rgba(250,246,240,.85);padding:4px 12px;border-radius:12px" id="venue-chat-title">场馆</span>
+        </div>
+        <div id="venue-dialogue"></div>
+      </div>
+    </div>
+
+    <!-- ==================== Stage 3, Step 2: Photo Check-in (Dynamic) ==================== -->
+    <div class="view" id="stage2-step2">
+      <div class="center-col">
+        <div class="emoji-big">📸</div>
+        <h3 class="title-md" id="venue-photo-title">拍照打卡</h3>
+        <p class="text-muted" id="venue-photo-desc">模仿动物姿势</p>
+        <div style="width:100%;background:var(--bg2);border-radius:var(--radius);padding:20px;margin-bottom:1rem;text-align:center">
+          <div style="font-size:3rem;margin-bottom:.5rem" id="venue-photo-emoji">📸</div>
+          <p style="font-size:.82rem;font-weight:600" id="venue-photo-pose">拍照姿势</p>
+          <p style="font-size:.72rem;color:var(--muted)" id="venue-photo-detail">姿势说明</p>
+        </div>
+        <button class="btn-primary" onclick="App.next()">继续逛</button>
+      </div>
+    </div>
+
+    <!-- ==================== Stage 3, Step 3: Next Stop / Farewell (Dynamic) ==================== -->
+    <div class="view" id="stage2-step3">
+      <div class="center-col">
+        <div class="emoji-big" id="venue-transition-icon">🌅</div>
+        <h3 class="title-md" id="venue-transition-title">探险继续</h3>
+        <p class="text-muted" id="venue-transition-desc">下一站</p>
+        <div style="background:var(--bg2);border-radius:var(--radius);padding:12px;width:100%;margin-bottom:1rem" id="venue-transition-info">
+          <p style="font-size:.75rem;color:var(--accent);font-weight:600;margin-bottom:.3rem" id="venue-transition-label">下一站</p>
+          <p style="font-size:1rem;font-weight:700" id="venue-transition-next">场馆名</p>
+          <p style="font-size:.75rem;color:var(--muted)" id="venue-transition-eta">ETA</p>
+        </div>
+        <button class="btn-primary" onclick="App.next()" id="venue-transition-btn">前往下一站</button>
+      </div>
+    </div>
+
+    <!-- ==================== Stage 4, Step 0: Adventure Complete (新增) ==================== -->
+    <div class="view" id="stage3-step0">
+      <div class="center-col">
+        <div class="emoji-big" id="adventure-complete-emoji">🎊</div>
+        <h3 class="title-md" id="adventure-complete-title">恭喜你！完成了冒险</h3>
+        <p class="text-muted" id="adventure-complete-subtitle">带着满满的收获，回到人类世界的路上</p>
+        <div id="adventure-complete-info" style="background:var(--bg2);border-radius:var(--radius);padding:16px;width:100%;margin-bottom:1rem;text-align:center">
+          <!-- 由 JS 动态填充 -->
+        </div>
+        <button class="btn-primary" onclick="App.next()">📖 生成故事</button>
+      </div>
+    </div>
+
+    <!-- ==================== Stage 4, Step 1: Story Generating ==================== -->
+    <div class="view" id="stage3-step1">
+      <div style="flex:1;padding:16px;overflow-y:auto;-webkit-overflow-scrolling:touch">
+        <h3 class="title-md" style="text-align:center;margin-bottom:1rem">📖 我的红山冒险故事</h3>
+        <div id="story-spinner-2" style="display:flex;flex-direction:column;align-items:center;padding:20px">
+          <div class="spinner"></div>
+          <p style="font-size:.78rem;color:var(--muted);margin-top:.5rem">红山正在编写你的故事...</p>
+        </div>
+        <div id="story-text" class="story-card" style="display:none"></div>
+      </div>
+      <div id="story-actions" style="padding:12px 16px;display:none">
+        <button class="btn-primary" onclick="App.next()">下一步</button>
+        <button class="btn-secondary" style="margin-top:.4rem" onclick="Stage3.regenerate()">🔄 重新生成</button>
+        <button class="btn-secondary" style="margin-top:.4rem" onclick="Stage3.share()">📤 分享故事</button>
+      </div>
+    </div>
+
+    <!-- ==================== Stage 4, Step 2: Story Complete ==================== -->
+    <div class="view" id="stage3-step2">
+      <div class="center-col">
+        <div class="emoji-big">🎉</div>
+        <h3 class="title-md">冒险完成！</h3>
+        <p class="text-muted">你的红山故事已保存</p>
+        <div id="story-complete-info" style="background:var(--bg2);border-radius:var(--radius);padding:16px;width:100%;margin-bottom:1rem;text-align:center">
+          <!-- 由 JS 动态填充 -->
+        </div>
+        <button class="btn-primary" onclick="App.next()">回到人类世界</button>
+      </div>
+    </div>
+
+    <!-- ==================== Stage 4, Step 3: Ending ==================== -->
+    <div class="view" id="stage3-step3">
+      <div class="center-col">
+        <div class="emoji-big" id="ending-emoji">🌿🐾🌿</div>
+        <h3 class="title-md" id="ending-title">再见，小探险家！</h3>
+        <p class="text-muted">带着红山的记忆，回到人类世界<br>期待下次再来探险！</p>
+        <button class="btn-primary" onclick="App.goToStage(0,0)">重新体验</button>
+      </div>
+    </div>
+
+  </div><!-- /view-container -->
+</div><!-- /app-container -->
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script src="js/zoo-data.js?v=7"></script>
+<script src="js/components.js?v=12"></script>
+<script src="js/rag.js?v=8"></script>
+<script src="js/llm.js?v=20"></script>
+<script src="js/datasource.js?v=10"></script>
+<script src="js/tts.js?v=4"></script>
+<script src="js/app.js?v=35"></script>
+<script>
+  // 初始化 RAG 知识库
+  if (typeof RAG !== 'undefined') {
+    RAG.init().then(() => {
+      console.log('[App] RAG 知识库初始化完成');
+    }).catch(err => {
+      console.warn('[App] RAG 初始化失败，将使用 Mock 兜底:', err);
+    });
+  }
+</script>
+</body>
+</html>

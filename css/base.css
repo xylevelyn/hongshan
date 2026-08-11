@@ -1,0 +1,636 @@
+/* ==================== Design System ==================== */
+:root {
+  /* Colors */
+  --accent: #E07A28;
+  --accent-dark: #CC6B20;
+  --accent-soft: rgba(224,122,40,.12);
+  --accent2: #5B8C5A;
+  --bg: #FAF6F0;
+  --bg2: #F0EBE3;
+  --ink: #2C2C2C;
+  --muted: #999;
+  --rule: #E5E5E5;
+  --radius: 12px;
+  --white: #fff;
+  --shadow: 0 2px 12px rgba(0,0,0,.08);
+
+  /* Fonts */
+  --font: -apple-system, "PingFang SC", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+html, body { height:100%; overflow:hidden; }
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--ink);
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-x: hidden;
+  word-wrap: break-word;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* Prevent flex children from overflowing */
+input, button, textarea, select { max-width: 100%; }
+input[type="number"] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+/* Ensure flex items can shrink properly */
+.input-bar input,
+.chat-input-bar input,
+#age-list input { min-width: 0; }
+
+/* ==================== Phone Frame ==================== */
+.app-container {
+  width: 100vw;
+  height: 100vh;
+  max-width: 430px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+/* ==================== Status Bar ==================== */
+.status-bar {
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  font-size: 14px;
+  font-weight: 600;
+  flex-shrink: 0;
+  z-index: 10;
+}
+
+/* ==================== View Container ==================== */
+.view-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+.view {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  display: none;
+  flex-direction: column;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.view.active { display: flex; }
+
+/* ==================== Buttons ==================== */
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity .2s;
+}
+.btn-primary:active { opacity: .8; }
+.btn-primary:disabled { opacity: .4; }
+
+.btn-secondary {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--ink);
+  font-size: 1rem;
+  cursor: pointer;
+}
+.btn-secondary:active { background: var(--bg2); }
+
+/* ==================== Chat Bubble ==================== */
+.chat-area {
+  flex: 1;
+  padding: 16px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.chat-bubble {
+  max-width: 80%;
+  margin-bottom: 12px;
+  padding: 10px 14px;
+  border-radius: 16px;
+  font-size: .85rem;
+  line-height: 1.6;
+  animation: bubbleIn .3s ease;
+}
+.chat-bubble .sender {
+  font-size: .7rem;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.chat-bubble.ai {
+  background: var(--bg2);
+  border-radius: 16px 16px 16px 4px;
+  align-self: flex-start;
+}
+.chat-bubble.user {
+  background: var(--accent);
+  color: #fff;
+  border-radius: 16px 16px 4px 16px;
+  align-self: flex-end;
+}
+.chat-bubble.system {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 600;
+  text-align: center;
+  align-self: center;
+  border-radius: 20px;
+  font-size: .78rem;
+}
+
+@keyframes bubbleIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ==================== Dialogue Overlay ==================== */
+.dialogue-overlay {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(255,255,255,.95);
+  backdrop-filter: blur(10px);
+  border-radius: 16px 16px 0 0;
+  box-shadow: 0 -4px 20px rgba(0,0,0,.08);
+  padding: 16px;
+  z-index: 100;
+  max-height: 240px;
+  overflow: hidden;
+  transition: max-height .4s cubic-bezier(.4,0,.2,1), padding .35s ease, background .3s ease, box-shadow .3s ease, border-radius .3s ease;
+  display: flex;
+  flex-direction: column;
+}
+/* Multi-turn dialogue: expand upward to near top */
+.dialogue-overlay.expanded {
+  max-height: calc(100% - 20px);
+  border-radius: 16px 16px 0 0;
+}
+.dialogue-overlay.expanded .dialogue-chat-area {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 8px 0;
+  min-height: 0;
+}
+/* Chat area inside dialogue overlay (hidden by default, shown when expanded) */
+.dialogue-chat-area {
+  display: none;
+  overflow-y: auto;
+}
+.dialogue-overlay.expanded .dialogue-chat-area {
+  display: block;
+}
+/* When expanded, hide NPC text and quick replies are still visible */
+.dialogue-overlay.expanded .npc-text {
+  display: none;
+}
+.dialogue-overlay.collapsed {
+  max-height: 60px;
+  padding: 0;
+  background: transparent;
+  backdrop-filter: none;
+  box-shadow: none;
+  border-radius: 0;
+  overflow: visible;
+}
+.dialogue-overlay.collapsed > *:not(.collapse-btn) {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .15s ease;
+}
+.dialogue-overlay > *:not(.collapse-btn) {
+  transition: opacity .3s ease;
+}
+.dialogue-overlay.collapsed .collapse-btn {
+  position: absolute;
+  bottom: 16px;
+  right: 16px;
+  top: auto;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,.2);
+  z-index: 101;
+}
+
+.collapse-btn {
+  position: absolute;
+  top: -12px;
+  right: 16px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--bg2);
+  border: none;
+  font-size: .8rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--muted);
+  z-index: 101;
+}
+
+.npc-name {
+  font-size: .78rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin-bottom: 4px;
+}
+.npc-text {
+  font-size: .85rem;
+  color: var(--ink);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.quick-replies {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.quick-reply {
+  padding: 6px 14px;
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  border-radius: 20px;
+  font-size: .75rem;
+  cursor: pointer;
+  background: transparent;
+  transition: all .2s;
+}
+.quick-reply:active { background: var(--accent); color: #fff; }
+
+.chat-input-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.chat-input-bar input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 24px;
+  font-size: .85rem;
+  outline: none;
+  background: var(--bg);
+}
+.chat-input-bar input:focus { border-color: var(--accent); }
+.mic-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: var(--accent);
+  color: #fff;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.mic-btn:active { transform: scale(.92); }
+.mic-btn.listening { background: #ff4444; animation: pulse 1s infinite; }
+
+@keyframes pulse {
+  0%,100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+/* ==================== Toast ==================== */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0,0,0,.8);
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 20px;
+  font-size: .8rem;
+  z-index: 9999;
+  opacity: 0;
+  transition: opacity .3s;
+  pointer-events: none;
+  white-space: nowrap;
+}
+.toast.show { opacity: 1; }
+
+/* ==================== Map ==================== */
+.map-view {
+  flex: 1;
+  background: var(--bg2);
+  background-size: cover;
+  background-position: center;
+  position: relative;
+  overflow: hidden;
+  min-height: 200px;
+}
+.map-pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 2;
+  max-width: 60px;
+}
+.pin-circle {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--accent);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .7rem;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0,0,0,.2);
+}
+.pin-label {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: .6rem;
+  color: var(--ink);
+  white-space: nowrap;
+  background: rgba(255,255,255,.8);
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+.map-pin.visited .pin-circle { background: var(--accent2); }
+.footprint-trail {
+  position: absolute;
+  font-size: 1rem;
+  z-index: 1;
+  opacity: .6;
+  animation: footprintFade .5s ease;
+}
+@keyframes footprintFade {
+  from { opacity: 0; transform: scale(.5); }
+  to { opacity: .6; transform: scale(1); }
+}
+
+/* ==================== Gacha ==================== */
+.gacha-row {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.gacha-capsule {
+  width: 80px;
+  height: 100px;
+  background: linear-gradient(180deg, var(--bg2), var(--rule));
+  border-radius: 40px 40px 40px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  cursor: pointer;
+  transition: transform .3s;
+}
+.gacha-capsule:active { transform: scale(.95); }
+.gacha-capsule.opened {
+  background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+  animation: gachaOpen .5s ease;
+}
+@keyframes gachaOpen {
+  0% { transform: scale(1) rotate(0); }
+  50% { transform: scale(1.2) rotate(10deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+.gacha-capsule .q-mark {
+  font-size: 2rem;
+  color: var(--muted);
+}
+.gacha-capsule .char-icon {
+  font-size: 2rem;
+  display: none;
+}
+.gacha-capsule.opened .q-mark { display: none; }
+.gacha-capsule.opened .char-icon { display: block; }
+/* Name label below gacha capsule */
+.gacha-row { margin-bottom: 2.5rem; }
+.capsule-name {
+  transition: color .3s ease;
+}
+
+/* ==================== Input Bar ==================== */
+.input-bar {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  background: var(--white);
+}
+.input-bar input {
+  flex: 1;
+  border: none;
+  outline: none;
+  padding: 8px;
+  font-size: .85rem;
+  background: transparent;
+}
+.rand-btn {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 8px;
+  background: var(--accent2);
+  color: #fff;
+  font-size: .75rem;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ==================== Utility ==================== */
+.center-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 20px;
+  flex: 1;
+  text-align: center;
+}
+.emoji-big { font-size: 2.5rem; margin-bottom: .5rem; }
+.title-md { font-size: 1.1rem; font-weight: 700; margin-bottom: .3rem; }
+.text-muted { color: var(--muted); font-size: .82rem; margin-bottom: 1rem; }
+.text-accent { color: var(--accent); font-weight: 600; }
+
+/* Loading spinner */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--rule);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+@keyframes bounce {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+/* ==================== View Transitions ==================== */
+.view {
+  transition: opacity .3s ease, transform .3s ease;
+}
+.view.entering {
+  opacity: 0;
+  transform: translateX(30px);
+}
+.view.active.entering {
+  opacity: 1;
+  transform: translateX(0);
+}
+.view.leaving {
+  opacity: 0;
+  transform: translateX(-30px);
+}
+
+/* ==================== Chat Input Bar (component) ==================== */
+.chat-input-bar {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.chat-input-bar input {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--rule);
+  border-radius: 24px;
+  font-size: .85rem;
+  outline: none;
+  background: var(--bg);
+}
+.chat-input-bar input:focus { border-color: var(--accent); }
+
+/* Voice mode: speak button */
+.speak-btn {
+  flex: 1;
+  padding: 11px 14px;
+  border: 1px solid var(--accent);
+  border-radius: 24px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: .85rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+  transition: all .15s ease;
+  touch-action: none;
+}
+.speak-btn:active { transform: scale(.98); }
+.speak-btn.recording {
+  background: #ff4444;
+  color: #fff;
+  border-color: #ff4444;
+  animation: pulse 1s infinite;
+}
+
+/* Keyboard toggle button (voice mode) */
+.keyboard-btn {
+  background: var(--bg2) !important;
+  color: var(--ink) !important;
+  border: 1px solid var(--rule);
+}
+
+/* Input bar voice mode adjustments */
+.input-bar.voice-mode,
+.chat-input-bar.voice-mode {
+  gap: 8px;
+}
+
+/* ==================== Typing Indicator ==================== */
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  padding: 4px 0;
+}
+.typing-indicator span {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--muted);
+  animation: typingBounce .6s infinite alternate;
+}
+.typing-indicator span:nth-child(2) { animation-delay: .2s; }
+.typing-indicator span:nth-child(3) { animation-delay: .4s; }
+@keyframes typingBounce {
+  from { opacity: .3; transform: translateY(0); }
+  to { opacity: 1; transform: translateY(-4px); }
+}
+
+/* Thinking label (shown during LLM request before first chunk) */
+.thinking-label {
+  font-size: .72rem;
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+/* ==================== Story Card ==================== */
+.story-card {
+  background: var(--bg2);
+  border-radius: var(--radius);
+  padding: 20px 16px;
+  margin-bottom: 1rem;
+  font-size: .85rem;
+  line-height: 1.8;
+  color: var(--ink);
+  white-space: pre-wrap;
+  max-height: 400px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  position: relative;
+}
+.story-card::before {
+  content: '📖';
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg);
+  padding: 0 8px;
+  font-size: 1.2rem;
+}
