@@ -693,43 +693,52 @@ const ZooData = {
    */
   generateQuickReplies(animalCode, venueCode, languageLevel) {
     const relation = this.getRelationship(animalCode, venueCode);
-    const animal = this.getAnimalById(animalCode);
     const venue = VENUES.find(v => v.code === venueCode);
-    if (!animal || !venue) return [];
+    if (!venue) return [];
 
-    const venueAnimal = venue.animals.split('、')[0];
+    const venueAnimals = venue.animals.split('、');
+    const venueAnimal = venueAnimals[0];
+    // 第二个场馆动物（如有），用于扩展问题
+    const venueAnimal2 = venueAnimals[1] || venueAnimal;
     const replies = [];
 
+    // 所有预制问题围绕场馆内的动物，不围绕用户的动物身份
     switch (relation.type) {
       case '天':
-        replies.push({ text: `${venueAnimal}怎么捕猎？`, question: `${venueAnimal}是怎么捕猎的？${animal.name}怎么躲避？` });
-        replies.push({ text: '怎么防御？', question: `${animal.name}遇到天敌时怎么防御和保护自己？` });
-        replies.push({ text: `${venueAnimal}的特征`, question: `${venueAnimal}有什么让${animal.name}害怕的特征？` });
+        // 场馆是天敌的地盘，问题聚焦天敌物种本身
+        replies.push({ text: `${venueAnimal}怎么捕猎？`, question: `${venueAnimal}的捕猎方式是怎样的？` });
+        replies.push({ text: `${venueAnimal}的捕猎策略？`, question: `${venueAnimal}有什么特别的捕猎技巧？成功率高吗？` });
+        replies.push({ text: `${venueAnimal}的特征`, question: `${venueAnimal}有哪些鲜明的外形和行为特征？` });
         break;
       case '巡':
-        replies.push({ text: '猎物有哪些？', question: `在${venue.name}，${animal.name}能找到哪些猎物？` });
-        replies.push({ text: '怎么捕猎？', question: `${animal.name}是怎么捕猎的？跟野外有什么不同？` });
-        replies.push({ text: '行为丰容', question: `饲养员怎么为${animal.name}做行为丰容？` });
+        // 场馆是猎场，问题聚焦场馆里的猎物物种
+        replies.push({ text: `${venueAnimal}有什么习性？`, question: `${venueAnimal}的生活习性是怎样的？` });
+        replies.push({ text: `${venueAnimal}的天敌？`, question: `野外${venueAnimal}主要面临哪些天敌威胁？` });
+        replies.push({ text: `行为丰容怎么做？`, question: `饲养员为${venueAnimal}做了哪些行为丰容？` });
         break;
       case '家':
-        replies.push({ text: '家族故事', question: `${venue.name}的${animal.name}家族有什么故事？` });
-        replies.push({ text: '生活习性', question: `${animal.name}在老家是怎么生活的？` });
-        replies.push({ text: '挖洞/筑巢', question: `${animal.name}怎么建造自己的家？` });
+        // 场馆是用户动物的家，聚焦场馆里的这个家族/种群
+        replies.push({ text: '种群故事', question: `${venue.name}的${venueAnimal}种群有什么故事？比如有哪些个体？` });
+        replies.push({ text: '生活习性', question: `${venueAnimal}在野外的典型生活习性是怎样的？` });
+        replies.push({ text: '社群结构', question: `${venueAnimal}的社群结构是怎样的？有等级制度吗？` });
         break;
       case '亲':
-        replies.push({ text: '哪里像？', question: `${animal.name}和${venueAnimal}有什么相似之处？` });
-        replies.push({ text: '哪里不同？', question: `${animal.name}和${venueAnimal}有什么不同？为什么会这样？` });
-        replies.push({ text: '演化关系', question: `${animal.name}和这里的动物是怎么演化成不同种的？` });
+        // 场馆是远亲地盘，聚焦场馆内的远亲物种
+        replies.push({ text: `${venueAnimal}的特征`, question: `${venueAnimal}有什么典型特征？` });
+        replies.push({ text: `${venueAnimal}的习性？`, question: `${venueAnimal}的生活习性是怎样的？` });
+        replies.push({ text: '保护现状', question: `${venueAnimal}目前的保护等级和种群状况怎么样？` });
         break;
       case '友':
-        replies.push({ text: '怎么共存？', question: `${animal.name}和${venueAnimal}在野外怎么和平共处？` });
-        replies.push({ text: '互相帮助吗？', question: `${animal.name}和这里的动物会互相帮助吗？` });
-        replies.push({ text: '共同栖息地', question: `${animal.name}和${venueAnimal}的共同栖息地是什么样的？` });
+        // 场馆是友好邻居地盘，聚焦邻居物种
+        replies.push({ text: `${venueAnimal}的习性？`, question: `${venueAnimal}的生活习性是怎样的？` });
+        replies.push({ text: `${venueAnimal}吃什么？`, question: `${venueAnimal}主要以什么为食？` });
+        replies.push({ text: `${venueAnimal}的栖息地？`, question: `${venueAnimal}野外的栖息地类型是什么样的？` });
         break;
       default: // 中
-        replies.push({ text: `${venueAnimal}有什么特征？`, question: `${venueAnimal}有什么特别的地方？` });
-        replies.push({ text: `${venueAnimal}从哪来？`, question: `${venueAnimal}的原产地在哪？跟${animal.name}的家乡有什么不同？` });
-        replies.push({ text: '保护现状', question: `${venueAnimal}的保护现状怎么样？` });
+        // 场馆是跨大陆物种，聚焦这个异国物种
+        replies.push({ text: `${venueAnimal}有什么特征？`, question: `${venueAnimal}有什么特别的外形或行为特征？` });
+        replies.push({ text: `${venueAnimal}从哪来？`, question: `${venueAnimal}的原产地在哪？` });
+        replies.push({ text: '保护现状', question: `${venueAnimal}目前的保护状况怎么样？是濒危物种吗？` });
     }
 
     return replies;
@@ -831,14 +840,16 @@ const ZooData = {
 
   /**
    * 内容过滤：判断用户问题类型
+   * 只拦截明确的设施类问题（餐厅/卫生间/市集），其他全部交给 LLM 处理
+   * LLM 有 system prompt 约束，能更好地理解上下文和用户意图
    * @param {string} question
-   * @returns {{type: 'venue'|'restaurant'|'restroom'|'market'|'irrelevant', response?: string}}
+   * @returns {{type: 'venue'|'restaurant'|'restroom'|'market', response?: string}}
    */
   filterContent(question) {
     const q = question.toLowerCase();
 
-    // 餐厅/吃饭相关
-    if (/餐厅|吃饭|午餐|晚餐|食物|觅食|饿了|吃饭|餐饮|补给/.test(q)) {
+    // 餐厅/吃饭相关 — 只有明确询问设施位置时才拦截
+    if (/附近.*餐厅|餐厅.*在哪|哪里.*吃饭|哪里.*吃饭|哪.*餐厅|找.*餐厅|最近的餐厅/.test(q)) {
       return {
         type: 'restaurant',
         response: '附近有餐厅可以补给能量！让我为你找到最近的餐厅。作为动物身份，在野外觅食可是生存基本功——不过在红山，可以去人类餐厅休息补充体力。'
@@ -846,7 +857,7 @@ const ZooData = {
     }
 
     // 卫生间相关
-    if (/卫生间|厕所|洗手间|厕所|标记领地|排泄/.test(q)) {
+    if (/卫生间|厕所|洗手间/.test(q)) {
       return {
         type: 'restroom',
         response: '最近的卫生间就在附近！说起来，动物们也会用排泄物来标记领地和传递信息，每只的气味都不同，就像"名片"一样。不过人类还是用卫生间更方便！'
@@ -854,22 +865,15 @@ const ZooData = {
     }
 
     // 市集/购物相关
-    if (/市集|商店|购物|纪念品|周边|买|商品/.test(q)) {
+    if (/市集|商店|纪念品|周边|买.*纪念/.test(q)) {
       return {
         type: 'market',
         response: '附近有市集可以逛逛！可以挑选一些纪念品带回家。不过在红山，最好的纪念品是你今天学到的知识和拍下的照片哦！'
       };
     }
 
-    // 与动物/场馆相关（正常问题）
-    if (/动物|场馆|猫科|狼|猴|獴|熊|鹿|鸟|象|考拉|熊猫|吃什么|怎么|为什么|习性|特征|行为|丰容|保护/.test(q)) {
-      return { type: 'venue' };
-    }
-
-    // 无关问题
-    return {
-      type: 'irrelevant',
-      response: '这个问题好像跟动物探险关系不大呢！还是专注于眼前的动物吧——你有什么关于这个场馆或动物想了解的吗？'
-    };
+    // 默认全部当作场馆相关问题，交给 LLM 处理
+    // LLM 能根据上下文理解"我还是更喜欢爬树"等用户回答
+    return { type: 'venue' };
   }
 };

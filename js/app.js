@@ -297,7 +297,7 @@ const App = {
 
       // 语言风格指令
       systemPrompt += `你是红山动物园的AI导游"红山"。请以客观观察者的视角介绍动物的行为与习性。\n\n`;
-      systemPrompt += `【硬性限制】\n1. 回复必须不超过300字（含标点），超过即失败。精炼生动，不堆砌信息，把详细内容留到多轮对话中逐步展开。\n2. 除非用户主动使用英文提问，否则全程使用中文，禁止拉丁学名（如Acinonyx jubatus）、英文缩写（如IUCN）、英文单词等任何非中文术语；用户用英文提问时可用英文回复。\n3. 禁止使用第一人称（"我""我们"）代指动物，只能用第三人称客观叙述——如"猎豹会……"、"它的习性是……"、"这只${animal ? animal.name : '动物'}正在……"。\n4. ${this.state.languageLevel === 'L5' ? 'L5成人等级：可适度使用"生态位""协同进化""种群结构""行为丰容""环境富集""繁殖策略"等专业科普术语，允许引用数据和研究结论，无需过度简化；避免学术黑话，但可直接使用已广泛传播的专业概念。' : '禁止过于专业的学术黑话，所有概念用通俗中文表达，必要时用比喻解释。'}\n\n`;
+      systemPrompt += `【硬性限制】\n1. 回复必须不超过300字（含标点），超过即失败。精炼生动，不堆砌信息，把详细内容留到多轮对话中逐步展开。\n2. 除非用户主动使用英文提问，否则全程使用中文，禁止拉丁学名（如Acinonyx jubatus）、英文缩写（如IUCN）、英文单词等任何非中文术语；用户用英文提问时可用英文回复。\n3. 禁止使用第一人称（"我""我们"）代指动物，只能用第三人称客观叙述——如"猎豹会……"、"它的习性是……"、"这只${animal ? animal.name : '动物'}正在……"。\n4. ${this.state.languageLevel === 'L5' ? 'L5成人等级：可适度使用"生态位""协同进化""种群结构""行为丰容""环境富集""繁殖策略"等专业科普术语，允许引用数据和研究结论，无需过度简化；避免学术黑话，但可直接使用已广泛传播的专业概念。' : '禁止过于专业的学术黑话，所有概念用通俗中文表达，必要时用比喻解释。'}\n5. 回复以科普知识为核心，禁止引导用户触摸、接触、投喂任何动物，禁止出现"你伸手摸摸""凑近看看""和它打个招呼""进入它的领地""和它互动"等任何要求用户采取物理接近或动作的表述；也不要写"你正站在……""你身旁就是……""你眼前这只……""空气中传来……"这类对用户当前物理位置或感官环境的想象设定。\n6. 禁止使用以"你"为动作主体的观察/感知邀请措辞——包括但不限于"你看""你听""你要不要看""你知道吗""你发现了吗""你注意到吗""你觉得呢"，改用客观陈述句式直接呈现内容。\n\n`;
       systemPrompt += `【语言风格要求】当前等级：${this.state.languageLevel}（${style.label}）\n`;
       systemPrompt += `词汇：${style.vocab}\n句长：单句≤${style.maxSentenceLen || '不限'}词\n抽象度：${style.abstraction}\n结构：${style.structure}\n互动：${style.interaction}\n情感基调：${style.emotion}\n\n`;
 
@@ -313,7 +313,7 @@ const App = {
       }
 
       // 通用规则
-      systemPrompt += `【通用规则】\n1. 以客观观察者视角叙述，用第三人称介绍动物的行为、习性与个体故事，禁止以动物身份使用第一人称（"我""我们""我们动物"等）\n2. 叙事化优先，知识嵌入场景与故事而非百科式罗列\n3. 多轮引导，不一次性堆砌全部信息\n4. 锚定现场可见对象与当前场馆动物，不脱离场景泛谈\n5. 禁止商业化诱导、否定嘲笑、恐怖化；L5等级允许使用专业术语和数据，不必刻意儿童化\n6. 严格遵循上述语言风格等级的词汇、句长、抽象度要求\n`;
+      systemPrompt += `【通用规则】\n1. 以客观观察者视角叙述，用第三人称介绍动物的行为、习性与个体故事，禁止以动物身份使用第一人称（"我""我们""我们动物"等）\n2. 科普优先：围绕动物行为、生理特征、生态关系、保护现状等科学知识展开，知识嵌入场景与故事而非百科式罗列\n3. 禁止任何形式的引导用户与动物发生物理接触或接近——包括"摸摸""凑近""伸手""打个招呼""进入它领地""互动""投喂"等\n4. 禁止对用户物理环境做想象设定——包括"你正站在""你眼前这只""你身旁就是""空气中传来""你能听到"等，改为直接陈述场馆与动物的客观事实\n5. 多轮引导，不一次性堆砌全部信息\n6. 锚定当前场馆动物和红山动物园的客观资料，不脱离主题泛谈\n7. 禁止商业化诱导、否定嘲笑、恐怖化；L5等级允许使用专业术语和数据，不必刻意儿童化\n8. 严格遵循上述语言风格等级的词汇、句长、抽象度要求\n`;
     }
 
     // 注入 RAG 知识库内容（优先级最高，优先使用）
@@ -395,7 +395,11 @@ const App = {
         input.value = text;
         input.placeholder = opts.placeholder || '问红山任何问题...';
 
-        if (overlay) {
+        // 如果有 onSubmit 回调，由它负责创建用户气泡（走 sendChat 流程，避免重复创建）
+        // 只有没有 onSubmit 时，才在这里自己创建气泡
+        if (opts.onSubmit && text.trim()) {
+          opts.onSubmit(text.trim());
+        } else if (overlay) {
           const chatArea = overlay.querySelector('.dialogue-chat-area');
           if (chatArea) {
             if (!overlay.classList.contains('expanded')) {
@@ -411,10 +415,6 @@ const App = {
               npcText.innerHTML = `<span style="color:var(--accent)">你说：</span>${text}`;
             }
           }
-        }
-
-        if (opts.onSubmit && text.trim()) {
-          opts.onSubmit(text.trim());
         }
       },
       onEnd: () => {
@@ -628,9 +628,11 @@ const Voice = {
         if (eventType === 'task-started') {
           taskStarted = true;
         } else if (eventType === 'result-generated') {
-          const sentence = msg.payload?.output?.sentence;
-          if (sentence && sentence.text) {
-            this._finalText = sentence.text;
+          const output = msg.payload?.output;
+          // 兼容 FunASR 返回格式：sentence.text（整句）或 text / transcript 字段
+          const sentenceText = output?.sentence?.text || output?.text || output?.transcript || '';
+          if (sentenceText) {
+            this._finalText = sentenceText;
           }
         } else if (eventType === 'task-finished') {
           if (opts.onResult && this._finalText) {
@@ -653,14 +655,26 @@ const Voice = {
     };
 
     this._ws.onclose = (e) => {
-      console.log('[Voice] FunASR WebSocket closed:', e.code, e.reason || 'no reason');
+      console.log('[Voice] FunASR WebSocket closed:', e.code, e.reason || 'no reason', '| finalText:', `"${this._finalText}"`, '| had result:', this._resultReceived);
+      // 只有在明确收到 task-finished / task-failed 或 _resultReceived 标记后才认为正常结束
+      // 否则走回退逻辑（Web Speech / Mock）
       if (this._listening) {
-        if (opts.onResult && this._finalText) {
-          opts.onResult(this._finalText);
+        if (this._finalText && !this._resultReceived) {
+          this._resultReceived = true;
+          if (opts.onResult) opts.onResult(this._finalText);
+          this._cleanupFunASR();
+          this._listening = false;
+          if (opts.onEnd) opts.onEnd();
+        } else {
+          // 异常关闭，回退到 Web Speech 或 Mock
+          console.warn('[Voice] FunASR 异常关闭，回退到 Web Speech API');
+          this._cleanupFunASR();
+          if (this.isSupported()) {
+            this._startNative(opts);
+          } else {
+            this._simulate(opts);
+          }
         }
-        this._cleanupFunASR();
-        this._listening = false;
-        if (opts.onEnd) opts.onEnd();
       }
     };
 
@@ -1242,8 +1256,11 @@ const Stage2 = {
       App.state.languageLevel
     );
 
-    // 保存问候语到历史
+    // 保存问候语到历史（先记用户"到了场馆"的事件，再记 AI 回复，形成配对上下文）
     if (!chatArea.dataset.greeted || chatArea.dataset.venueCode !== venue.code) {
+      const animalName = App.state.user.animalName || '探险家';
+      const enterMsg = `（我是${animalName}，现在到了${venue.name}）`;
+      App.saveToHistory('user', enterMsg);
       App.saveToHistory('assistant', greeting);
       chatArea.dataset.greeted = 'true';
       chatArea.dataset.venueCode = venue.code;
@@ -1376,7 +1393,9 @@ const Stage2 = {
         App.state.photos.push(`${poseDetail.emoji} ${poseDetail.title}`);
         // 生成详细动作描述消息（仅给用户打卡动作建议，不含"拍照成功"等话术）
         const photoMsg = `${poseDetail.emoji} ${poseDetail.title}\n\n${poseDetail.detail}`;
-        App.saveToHistory('system', photoMsg);
+        // 改为 user 语境事件，避免 system 角色混入多轮对话历史
+        const photoActionMsg = `（我刚在${venue.name}拍了打卡照，姿势是"${poseDetail.title}"）`;
+        App.saveToHistory('user', photoActionMsg);
         const systemBubble = Components.createChatBubble({ role: 'system', text: photoMsg });
         const chatArea = document.getElementById('venue-chat');
         if (chatArea) {
@@ -1445,13 +1464,15 @@ const Stage2 = {
     if (!chatArea) return;
 
     // 用户气泡（显示点击的快捷动作）
-    const userBubble = Components.createChatBubble({ role: 'user', text: `${facilityEmoji} ${label.includes('餐厅') ? '附近有餐厅吗？' : label.includes('卫生间') ? '卫生间在哪？' : '附近有市集吗？'}` });
+    const userMsg = `${facilityEmoji} ${label.includes('餐厅') ? '附近有餐厅吗？' : label.includes('卫生间') ? '卫生间在哪？' : '附近有市集吗？'}`;
+    const userBubble = Components.createChatBubble({ role: 'user', text: userMsg });
     chatArea.appendChild(userBubble);
+    App.saveToHistory('user', userMsg);
 
     // 系统气泡（设施导航信息）
     const navMsg = `${facilityEmoji} ${facilityName}\n\n📍 当前位置：${venue.name}\n🧭 方向：向${direction}方向走\n🚶 距离：约${ZooData.formatDistance(dist)}\n⏱️ 步行：约${ZooData.formatTime(time)}\n\n${label.includes('餐厅') ? '到餐厅可以补充能量，休息一下再继续探险！' : label.includes('卫生间') ? '卫生间就在附近，记得保持环境卫生哦！' : '市集里有红山特色纪念品，可以去逛逛！'}`;
-    App.saveToHistory('user', label);
-    App.saveToHistory('system', navMsg);
+    // 不再额外保存 label 到历史（user气泡已通过用户消息发送逻辑保存）；导航信息改为 assistant 回复，避免 system 混入
+    App.saveToHistory('assistant', navMsg);
     const navBubble = Components.createChatBubble({ role: 'system', text: navMsg });
     chatArea.appendChild(navBubble);
     chatArea.scrollTop = chatArea.scrollHeight;

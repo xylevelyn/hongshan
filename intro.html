@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>红山动物星球 · 产品介绍</title>
+<style>
+  :root {
+    --bg: #faf6f0;
+    --bg2: #f0ebe2;
+    --ink: #2d2418;
+    --muted: #7a6f60;
+    --accent: #4a8f4a;
+    --accent2: #d68a3a;
+    --rule: rgba(0,0,0,.08);
+    --radius: 14px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    line-height: 1.7;
+    font-size: 15px;
+  }
+  .container { max-width: 880px; margin: 0 auto; padding: 0 20px; }
+  section { padding: 60px 0; border-bottom: 1px solid var(--rule); }
+  h1 { font-size: 2.2rem; font-weight: 800; letter-spacing: -.5px; margin-bottom: 8px; }
+  h2 { font-size: 1.5rem; font-weight: 700; margin-bottom: 16px; color: var(--accent); }
+  h3 { font-size: 1.1rem; font-weight: 700; margin: 18px 0 8px; }
+  p { margin-bottom: 12px; color: var(--ink); }
+  .subtitle { font-size: 1.05rem; color: var(--muted); margin-bottom: 24px; }
+  .tagline {
+    display: inline-block; padding: 4px 12px; background: rgba(74,143,74,.12);
+    color: var(--accent); border-radius: 999px; font-size: .82rem; font-weight: 600;
+    margin-bottom: 12px;
+  }
+
+  /* Hero */
+  .hero {
+    text-align: center; padding: 80px 0 60px;
+    background: linear-gradient(180deg, rgba(74,143,74,.08) 0%, transparent 100%);
+  }
+  .hero .emoji { font-size: 3.2rem; margin-bottom: 12px; }
+  .hero h1 { margin-bottom: 12px; }
+  .hero .subtitle { max-width: 560px; margin: 0 auto 20px; }
+
+  /* 卡片网格 */
+  .grid {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 14px; margin-top: 16px;
+  }
+  .card {
+    background: #fff; border: 1px solid var(--rule); border-radius: var(--radius);
+    padding: 18px; transition: box-shadow .2s, transform .2s;
+  }
+  .card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); transform: translateY(-2px); }
+  .card .icon { font-size: 1.6rem; margin-bottom: 8px; }
+  .card h3 { margin-top: 0; }
+  .card p { font-size: .9rem; color: var(--muted); margin-bottom: 0; }
+
+  /* MVP 路径 */
+  .mvp-path {
+    counter-reset: step; list-style: none; padding: 0; margin-top: 16px;
+  }
+  .mvp-path li {
+    counter-increment: step; position: relative; padding: 14px 18px 14px 56px;
+    background: #fff; border: 1px solid var(--rule); border-radius: var(--radius);
+    margin-bottom: 10px;
+  }
+  .mvp-path li::before {
+    content: counter(step); position: absolute; left: 16px; top: 14px;
+    width: 28px; height: 28px; border-radius: 50%; background: var(--accent);
+    color: #fff; font-weight: 700; font-size: .85rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .mvp-path li h3 { margin: 0 0 4px; font-size: 1rem; }
+  .mvp-path li p { margin: 0; font-size: .88rem; color: var(--muted); }
+  .mvp-path li.done { border-left: 4px solid var(--accent); }
+  .mvp-path li.done::after {
+    content: '✓ 已实现'; position: absolute; right: 14px; top: 14px;
+    font-size: .72rem; color: var(--accent); font-weight: 600;
+  }
+  .mvp-path li.todo { border-left: 4px solid var(--accent2); opacity: .9; }
+  .mvp-path li.todo::after {
+    content: '待实现'; position: absolute; right: 14px; top: 14px;
+    font-size: .72rem; color: var(--accent2); font-weight: 600;
+  }
+
+  /* 体验阶段时间线 */
+  .timeline { position: relative; padding-left: 24px; margin-top: 16px; }
+  .timeline::before {
+    content: ''; position: absolute; left: 6px; top: 4px; bottom: 4px;
+    width: 2px; background: var(--rule);
+  }
+  .stage-item { position: relative; margin-bottom: 22px; }
+  .stage-item::before {
+    content: ''; position: absolute; left: -22px; top: 6px;
+    width: 12px; height: 12px; border-radius: 50%;
+    background: var(--accent); border: 2px solid var(--bg);
+  }
+  .stage-item .stage-label {
+    display: inline-block; font-size: .72rem; font-weight: 700;
+    padding: 2px 8px; border-radius: 4px; background: rgba(74,143,74,.14);
+    color: var(--accent); margin-right: 6px;
+  }
+  .stage-item h3 { display: inline; margin: 0; font-size: 1rem; }
+  .stage-item p { margin: 6px 0 0; font-size: .9rem; }
+
+  /* 手机示意图 */
+  .phone-row {
+    display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;
+    margin-top: 24px;
+  }
+  .phone {
+    width: 200px; background: #fff; border: 1px solid var(--rule);
+    border-radius: 22px; padding: 12px; box-shadow: 0 6px 18px rgba(0,0,0,.08);
+    font-size: .8rem;
+  }
+  .phone .screen {
+    background: var(--bg2); border-radius: 14px; padding: 14px 10px;
+    min-height: 280px; display: flex; flex-direction: column;
+  }
+  .phone .screen .emoji { font-size: 1.4rem; text-align: center; margin-bottom: 6px; }
+  .phone .screen .title { font-weight: 700; text-align: center; font-size: .9rem; margin-bottom: 6px; }
+  .phone .screen .bubble {
+    background: #fff; border-radius: 10px; padding: 6px 8px;
+    margin-bottom: 6px; font-size: .72rem; color: var(--ink);
+  }
+  .phone .screen .bubble.ai { border-left: 3px solid var(--accent); }
+  .phone .screen .bubble.user { border-left: 3px solid var(--accent2); align-self: flex-end; }
+  .phone .screen .btn {
+    background: var(--accent); color: #fff; text-align: center;
+    padding: 6px; border-radius: 8px; font-size: .72rem; margin-top: auto;
+  }
+  .phone .caption {
+    text-align: center; font-size: .76rem; color: var(--muted);
+    margin-top: 8px; font-weight: 600;
+  }
+
+  /* 表格 */
+  table { width: 100%; border-collapse: collapse; margin-top: 16px; font-size: .9rem; }
+  th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--rule); }
+  th { background: var(--bg2); font-weight: 700; color: var(--ink); }
+  td { color: var(--muted); }
+  tr:hover td { background: rgba(74,143,74,.04); }
+
+  footer {
+    text-align: center; padding: 40px 20px; color: var(--muted); font-size: .85rem;
+  }
+  footer a { color: var(--accent); text-decoration: none; }
+
+  @media (max-width: 600px) {
+    h1 { font-size: 1.8rem; }
+    .phone { width: 160px; }
+    .phone .screen { min-height: 220px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ==================== Hero ==================== -->
+<header class="hero">
+  <div class="container">
+    <div class="emoji">🌿🦊🌿</div>
+    <span class="tagline">陪伴式游览 Agent</span>
+    <h1>红山动物星球</h1>
+    <p class="subtitle">不是冷冰冰的导览器，而是一个会陪你说话的伙伴。<br>你变身成一种动物，它就按你的身份、年龄、场馆关系陪你走完整个旅程。</p>
+  </div>
+</header>
+
+<!-- ==================== 产品定位 ==================== -->
+<section id="positioning">
+  <div class="container">
+    <h2>🎯 产品定位</h2>
+    <p>面向红山森林动物园游客的 <strong>陪伴式 AI 游览 Agent</strong>。核心差异在于三点：</p>
+    <div class="grid">
+      <div class="card">
+        <div class="icon">🎭</div>
+        <h3>动物身份沉浸</h3>
+        <p>游客选择幻化成一种动物（细尾獴、雪豹、东北虎等 9 种），以动物视角探索场馆，关系类型决定叙事基调。</p>
+      </div>
+      <div class="card">
+        <div class="icon">🎯</div>
+        <h3>年龄自适应讲解</h3>
+        <p>5 级语言风格（L1-L5），从叠音拟声词到生态学术语，一家人同逛一个馆，大人小孩各听各的版本。</p>
+      </div>
+      <div class="card">
+        <div class="icon">🗣️</div>
+        <h3>多轮对话陪伴</h3>
+        <p>不是单向广播，而是可打断、可追问的对话。开口说话、打字提问、听朗读、拍照打卡、带走故事。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 最小 MVP 路径 ==================== -->
+<section id="mvp">
+  <div class="container">
+    <h2>🚀 最小 MVP 路径</h2>
+    <p>从核心体验到完整产品，分 6 步走。前 5 步已在本 Demo 中实现。</p>
+    <ol class="mvp-path">
+      <li class="done">
+        <h3>身份选择 + 路线规划</h3>
+        <p>选动物身份、输入年龄、勾选场馆，自动生成游览路线。9 种动物 × 24 个场馆。</p>
+      </li>
+      <li class="done">
+        <h3>多轮 AI 对话导览</h3>
+        <p>基于 Qwen-Plus 大模型 + RAG 知识库，按场馆关系和语言风格生成回复，支持流式输出和打断追问。</p>
+      </li>
+      <li class="done">
+        <h3>语音输入 + 语音朗读</h3>
+        <p>FunASR 实时语音识别（按住说话）+ Web Speech API 分句朗读（疑问升调、感叹加强、过滤 emoji 和括号）。</p>
+      </li>
+      <li class="done">
+        <h3>拍照打卡 + 专属姿势</h3>
+        <p>按动物关系生成拍照姿势引导（如细尾獴在天敌场馆要"警觉避险"，在老家场馆要"回家团聚"）。</p>
+      </li>
+      <li class="done">
+        <h3>故事生成 + 游览闭环</h3>
+        <p>游览结束，AI 把整个旅程编成一个故事，融入身份、场馆、拍照记录。</p>
+      </li>
+      <li class="todo">
+        <h3>多用户并发 + 后端部署</h3>
+        <p>当前为本地 Demo（单用户）。下一步需加后端代理保管 API Key，支持多游客同时在线、游览记录云端保存。</p>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<!-- ==================== 功能概述 ==================== -->
+<section id="features">
+  <div class="container">
+    <h2>✨ 功能概述</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>模块</th>
+          <th>技术实现</th>
+          <th>用户感知</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>🦊 动物身份</td>
+          <td>9 种动物 × 6 种关系矩阵（天敌/巡猎/家/亲/友/中）</td>
+          <td>不同身份去不同场馆，听到不同基调的故事</td>
+        </tr>
+        <tr>
+          <td>🤖 AI 对话</td>
+          <td>Qwen-Plus + RAG 200 条知识库 + 流式输出</td>
+          <td>提问就有回答，内容基于红山真实推文和讲解稿</td>
+        </tr>
+        <tr>
+          <td>🎤 语音输入</td>
+          <td>FunASR paraformer-realtime-v2 + 本地 WebSocket 代理</td>
+          <td>按住说话，松开发送，识别准确率约 95%</td>
+        </tr>
+        <tr>
+          <td>🔊 语音朗读</td>
+          <td>Web Speech API + 分句停顿 + 句型语调</td>
+          <td>疑问句升调、感叹句加强，不读括号和 emoji</td>
+        </tr>
+        <tr>
+          <td>📸 拍照打卡</td>
+          <td>关系矩阵驱动姿势生成 + Camera API</td>
+          <td>每个场馆推荐专属姿势，解锁 6 种关系姿势</td>
+        </tr>
+        <tr>
+          <td>📖 故事生成</td>
+          <td>LLM 整合身份 + 场馆 + 拍照记录</td>
+          <td>游览结束带走一个完整冒险故事</td>
+        </tr>
+        <tr>
+          <td>🎯 年龄适配</td>
+          <td>L1-L5 五级语言风格规则</td>
+          <td>3 岁听叠音词，成人听生态学概念</td>
+        </tr>
+        <tr>
+          <td>🚻 设施导航</td>
+          <td>就近算法 + 预设话术</td>
+          <td>一键找到最近的餐厅/卫生间/市集</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ==================== 体验阶段 ==================== -->
+<section id="stages">
+  <div class="container">
+    <h2>🗺️ 体验阶段</h2>
+    <p>游客从进入到离开，共经历 4 个阶段、14 个步骤。</p>
+    <div class="timeline">
+      <div class="stage-item">
+        <span class="stage-label">阶段 1</span>
+        <h3>身份觉醒</h3>
+        <p>阅读隐私说明 → 输入人数和年龄 → 选择动物身份。系统根据年龄自动匹配 L1-L5 语言风格。</p>
+      </div>
+      <div class="stage-item">
+        <span class="stage-label">阶段 2</span>
+        <h3>路线规划</h3>
+        <p>浏览场馆地图 → 勾选想去的场馆 → 系统按大红山/放牛山/小红山/南门新区四片区生成最优路线，显示总距离和步行时间。</p>
+      </div>
+      <div class="stage-item">
+        <span class="stage-label">阶段 3</span>
+        <h3>场馆游览</h3>
+        <p>每个场馆包含：进场问候（关系基调）→ 预制问题气泡 → 多轮对话（语音/打字）→ 拍照打卡（专属姿势）→ 快捷导航（餐厅/卫生间/市集）→ 下一站。</p>
+      </div>
+      <div class="stage-item">
+        <span class="stage-label">阶段 4</span>
+        <h3>故事生成</h3>
+        <p>所有场馆游完 → AI 整合身份、场馆、拍照记录 → 生成完整冒险故事 → 可分享带走。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================== 界面示意 ==================== -->
+<section id="ui">
+  <div class="container">
+    <h2>📱 界面示意</h2>
+    <p>四个关键阶段的界面示意（手机端 H5）。</p>
+    <div class="phone-row">
+
+      <!-- 身份选择 -->
+      <div class="phone">
+        <div class="screen">
+          <div class="emoji">🦊</div>
+          <div class="title">选择动物身份</div>
+          <div class="bubble" style="text-align:center;font-size:.7rem;color:var(--muted)">点击卡片变身</div>
+          <div class="bubble">🐾 细尾獴 · 非洲草原</div>
+          <div class="bubble">🐆 雪豹 · 中亚高山</div>
+          <div class="bubble">🐯 东北虎 · 亚洲森林</div>
+          <div class="bubble">🐺 灰狼 · 北半球广布</div>
+          <div class="btn">确认变身</div>
+        </div>
+        <div class="caption">阶段 1 · 身份觉醒</div>
+      </div>
+
+      <!-- 场馆对话 -->
+      <div class="phone">
+        <div class="screen">
+          <div class="title">🐺 狼馆</div>
+          <div class="bubble ai">欢迎回家，灰狼！今天狼馆可热闹了，新狼王天涯正在巡视领地……</div>
+          <div class="bubble user">狼群有等级吗？</div>
+          <div class="bubble ai">狼群实行严格的等级制度。头狼夫妇优先进食、繁殖，其他成员服从……</div>
+          <div class="bubble" style="background:rgba(74,143,74,.1);font-size:.68rem;text-align:center">🐺 种群故事 · 🏃 生活习性 · 👥 社群结构</div>
+          <div class="btn">🎤 按住说话</div>
+        </div>
+        <div class="caption">阶段 3 · 场馆对话</div>
+      </div>
+
+      <!-- 拍照打卡 -->
+      <div class="phone">
+        <div class="screen">
+          <div class="title">📸 拍照打卡</div>
+          <div class="bubble ai">⚠️ 警觉避险 · 细尾獴遇到天敌猎豹！身体压低、贴地匍匐，眼睛警觉地盯着前方……</div>
+          <div class="bubble" style="text-align:center;font-size:1.6rem">😨📸</div>
+          <div class="bubble" style="text-align:center;font-size:.7rem;color:var(--muted)">已解锁天敌姿势</div>
+          <div class="btn">拍摄</div>
+        </div>
+        <div class="caption">阶段 3 · 拍照打卡</div>
+      </div>
+
+      <!-- 故事生成 -->
+      <div class="phone">
+        <div class="screen">
+          <div class="emoji">📖</div>
+          <div class="title">你的冒险故事</div>
+          <div class="bubble ai">今天，一只名叫"探险家"的细尾獴来到了红山动物星球。它先悄悄穿过猫科星球，压低身体避开猎豹的目光……</div>
+          <div class="bubble ai">然后在狼馆遇到了远亲，发现灰狼的尾巴和它一样用来传递信号……</div>
+          <div class="btn">📤 分享故事</div>
+        </div>
+        <div class="caption">阶段 4 · 故事生成</div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>红山动物星球 · 陪伴式游览 Agent Demo<br>
+  基于 Qwen-Plus + FunASR + RAG 知识库 · MIT License</p>
+</footer>
+
+</body>
+</html>

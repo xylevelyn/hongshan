@@ -208,7 +208,74 @@ server.on('upgrade', (req, socket, head) => {
       }
     } else {
       // 透传 DashScope → 客户端的 WebSocket 帧
-      socket.write(chunk);
+      // DashScope 发的帧无 mask，需要 encode 为无 mask 的帧再发给浏览器（服务器→客户端不需要mask）
+      // 先攒 buffer，按帧解析后重新封装
+      dashBuf = Buffer.concat([dashBuf, chunk]);
+      while (dashBuf.length > 0) {
+        const { frames, consumed } = parseFrame(dashBuf);
+        if (consumed === 0) break;
+
+        for (const frame of frames) {
+          // 打印来自 DashScope 的文本消息（方便排查）
+          if (frame.opcode === 1 && frame.payload.length > 0) {
+            try {
+              const msg = JSON.parse(frame.payload.toString('utf8'));
+              const ev = msg.header?.event;
+              const taskId = msg.header?.task_id;
+              if (ev) {
+                if (ev === 'result-generated') {
+                  const output = msg.payload?.output;
+                  const txt = output?.sentence?.text || output?.text || output?.transcript;
+                  const isFinal = output?.sentence?.final || output?.is_final || false;
+                  console.log(`[Proxy] DashScope → 客户端: ${ev} final=${isFinal} text="${txt}"`);
+                } else {
+                  console.log(`[Proxy] DashScope → 客户端: ${ev} id=${taskId || ''}`);
+                }
+              }
+            } catch (_e) {
+              console.log(`[Proxy] DashScope → 客户端: opcode=${frame.opcode} len=${frame.payload.length}`);
+            }
+          } else if (frame.opcode === 8) {
+            // Close 帧
+            let reason = '';
+            if (frame.payload.length >= 2) {
+              const code = frame.payload.readUInt16BE(0);
+              reason = frame.payload.slice(2).toString('utf8');
+              console.log(`[Proxy] DashScope → 客户端: Close code=${code} reason="${reason}"`);
+            } else {
+              console.log(`[Proxy] DashScope → 客户端: Close (no payload)`);
+            }
+          }
+          // 直接发送原帧给客户端（服务器→客户端无mask，帧格式保持不变）
+          if (socket.writable) {
+            // 构造无mask的帧
+            const noMaskFrame = Buffer.alloc(2);
+            noMaskFrame[0] = (frame.fin ? 0x80 : 0x00) | (frame.opcode & 0x0F);
+            const len = frame.payload.length;
+            let header;
+            if (len < 126) {
+              header = Buffer.alloc(2);
+              header[0] = (frame.fin ? 0x80 : 0x00) | (frame.opcode & 0x0F);
+              header[1] = len;
+              socket.write(Buffer.concat([header, frame.payload]));
+            } else if (len < 65536) {
+              header = Buffer.alloc(4);
+              header[0] = (frame.fin ? 0x80 : 0x00) | (frame.opcode & 0x0F);
+              header[1] = 126;
+              header.writeUInt16BE(len, 2);
+              socket.write(Buffer.concat([header, frame.payload]));
+            } else {
+              header = Buffer.alloc(10);
+              header[0] = (frame.fin ? 0x80 : 0x00) | (frame.opcode & 0x0F);
+              header[1] = 127;
+              header.writeBigUInt64BE(BigInt(len), 2);
+              socket.write(Buffer.concat([header, frame.payload]));
+            }
+          }
+        }
+
+        dashBuf = dashBuf.slice(consumed);
+      }
     }
   });
 
